@@ -1645,26 +1645,40 @@ bushes.castShadow=true; bushes.receiveShadow=true;
 }
 world.add(bushes);
 
-const petalGeo=new THREE.SphereGeometry(.17,5,4);
-const FLOWER_BEDS=[[0,38],[-4,28],[2,16],[-7,4],[-11,-10],[10,8],[20,3],[30,-3],[-16,6],[-24,3],[8,28],[20,30],[-20,32],[-32,22],[26,20],[42,-14]];
-[[C.red,54],[C.butter,46],[0xd9a7bd,40]].forEach(([col,n])=>{
-  const im=new THREE.InstancedMesh(petalGeo,mat(col,{rough:.8,map:false}),n);
-  const d=new THREE.Object3D();
+// Small pastel flowers on the lawn, using instancing instead of individual meshes.
+const flowerGeo=new THREE.SphereGeometry(.24,6,4);
+const FLOWER_BEDS=[
+  [0,38],[-4,28],[2,16],[-7,4],[-11,-10],[10,8],[20,3],[30,-3],
+  [-16,6],[-24,3],[8,28],[20,30],[-20,32],[-32,22],[26,20],[42,-14],
+  [-42,12],[36,15],[-16,-25],[16,-24]
+];
+const FLOWER_COLORS=[0xe9a8b8,0xf5d995,0xf7ebdd,0xc9b7df,0xa9cde2];
+FLOWER_COLORS.forEach((col,k)=>{
+  const n=MOBILE?28:48;
+  const mesh=new THREE.InstancedMesh(flowerGeo,
+    new THREE.MeshStandardMaterial({color:col,roughness:.9}),n);
+  const obj=new THREE.Object3D();
   for(let i=0;i<n;i++){
-    const bed=FLOWER_BEDS[i%FLOWER_BEDS.length];
-    const a=Math.random()*Math.PI*2, r=lerp(1.6,4.6,Math.random());
-    const x=bed[0]+Math.cos(a)*r, z=bed[1]+Math.sin(a)*r;
-    d.position.set(x,hAt(x,z)+.32,z); d.updateMatrix(); im.setMatrixAt(i,d.matrix);
+    const bed=FLOWER_BEDS[(i*7+k*3)%FLOWER_BEDS.length];
+    const angle=(i*2.399963+k)*1.1;
+    const radius=1.2+(i%7)*.62;
+    const x=bed[0]+Math.cos(angle)*radius;
+    const z=bed[1]+Math.sin(angle)*radius;
+    const scale=.65+(i%4)*.18;
+    obj.position.set(x,hAt(x,z)+.23*scale,z);
+    obj.scale.setScalar(scale);
+    obj.updateMatrix();
+    mesh.setMatrixAt(i,obj.matrix);
   }
-  world.add(im);
+  mesh.instanceMatrix.needsUpdate=true;
+  world.add(mesh);
 });
-
 
 /* seam planting: low scrub straddling the park edge, so the eye never finds a
    clean boundary between the disc and the country beyond. Sparse and clumped —
    an even hedge of blobs looks worse than the seam it hides. */
 {
-  const n=MOBILE?54:126;
+  const n=MOBILE?12:24;
   // a squashed sphere reads as a leafy bush; the icosahedron looked like rubble
   const geo=new THREE.SphereGeometry(1,7,5);
   // NOTE: deliberately NO vertexColors. This geometry has no colour attribute,
