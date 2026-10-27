@@ -1333,9 +1333,9 @@ for(let i=0;i<pos.count;i++){
   // two-tone turf: mown promenade lighter, rough grass darker, plus dry patches
   const q=Math.sin(x*.075+z*.06)*.5+.5;
   const c=new THREE.Color().setHSL(
-    lerp(.225,.185,p*.6+q*.4), lerp(.17,.11,q), lerp(.44,.55,p*.55+q*.45),
+    lerp(.29,.255,p*.6+q*.4), lerp(.16,.22,q), lerp(.62,.70,p*.55+q*.45),
     THREE.SRGBColorSpace);
-  c.lerp(new THREE.Color(0x8b9673), edge*.20);
+  c.lerp(new THREE.Color(0xb2c6a1), edge*.16);
   // faint worn earth where the promenade widens
   const worn=Math.exp(-Math.pow(Math.hypot(x*.9,(z-8)*.42)/17,2));
   c.lerp(new THREE.Color(0xc4b894), worn*.3);
@@ -1437,27 +1437,23 @@ let SKIRT_SNOW=null;   // outer-country snow blanket, driven with the park's
   SKIRT_SNOW=skirtSnow;
 }
 
-// Cloud-ring experiment: keep the playable park and its terrain untouched.
-// Replace only the distant conical mountain silhouettes with soft, faceted clouds.
+// A restrained distant cloud bank, below the skyline instead of floating rocks.
+// Keep the sky open and avoid adding more geometry over the rides.
 {
-  const cloudPalette=[0xf9e9e2,0xe5e7ff,0xd7e9f5,0xffe3df,0xf4e9cf];
-  const puffGeo=new THREE.IcosahedronGeometry(1,1);
-  const puffMats=cloudPalette.map(color=>{
-    const m=new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true,fog:true});
-    m.__base=m.color.clone(); BEYOND_MATS.push(m); return m;
-  });
-  const cloudCount=MOBILE?34:54;
+  const cloudMat=new THREE.MeshStandardMaterial({color:0xf4f0e8,roughness:1,flatShading:false,fog:true});
+  cloudMat.__base=cloudMat.color.clone(); BEYOND_MATS.push(cloudMat);
+  const puffGeo=new THREE.SphereGeometry(1,MOBILE?10:14,8);
+  const cloudCount=MOBILE?11:18;
   for(let i=0;i<cloudCount;i++){
-    const a=i*2.399963229728653;
-    const dist=GW*(1.05+(i%4)*.33);
-    const x=Math.cos(a)*dist,z=Math.sin(a)*dist;
+    const angle=i*2.399963229728653;
+    const dist=GW*(1.65+(i%3)*.35);
     const cloud=new THREE.Group();
-    cloud.position.set(x,8+(i%5)*2.3,z);
-    const scale=10+(i%7)*2.8;
-    for(let j=0;j<5;j++){
-      const puff=new THREE.Mesh(puffGeo,puffMats[(i+j)%puffMats.length]);
-      puff.position.set((j-2)*scale*.44,Math.sin(j*2.4+i)*scale*.12,Math.cos(j*1.8+i)*scale*.18);
-      puff.scale.set(scale*(.60+(j%3)*.13),scale*(.40+(j%2)*.10),scale*.68);
+    cloud.position.set(Math.cos(angle)*dist,-11-(i%3)*3,Math.sin(angle)*dist);
+    const width=17+(i%4)*5;
+    for(let j=0;j<4;j++){
+      const puff=new THREE.Mesh(puffGeo,cloudMat);
+      puff.position.set((j-1.5)*width*.32,Math.sin(j*2.1+i)*1.5,Math.cos(j*1.7)*2);
+      puff.scale.set(width*.39,width*.20,width*.30);
       cloud.add(puff);
     }
     beyond.add(cloud);
@@ -1466,7 +1462,7 @@ let SKIRT_SNOW=null;   // outer-country snow blanket, driven with the park's
 
 // far treeline haze: a soft ring of dark conifers where park meets country
 {
-  const n=MOBILE?48:115; // fewer dark conifers: open up the cloud horizon
+  const n=MOBILE?65:145; // sparse, varied treeline
   const geo=new THREE.ConeGeometry(1,1,MOBILE?5:7,2);
   const m=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.98,flatShading:true});
   m.__base=m.color.clone(); BEYOND_MATS.push(m);
@@ -1495,8 +1491,8 @@ let SKIRT_SNOW=null;   // outer-country snow blanket, driven with the park's
     d.rotation.set(Math.sin(i*1.7)*.05,i*1.7,Math.cos(i*2.3)*.05);
     d.updateMatrix(); inst.setMatrixAt(i,d.matrix);
     // recede in colour with distance so the trees melt into the hills
-    tc.setHSL(lerp(.245,.275,Math.abs(Math.sin(i*1.9))*.5+t*.5),
-              lerp(.22,.075,t), lerp(.28,.52,t), THREE.SRGBColorSpace);
+    tc.setHSL(lerp(.27,.38,Math.abs(Math.sin(i*1.9))*.5+t*.5),
+              lerp(.15,.25,t), lerp(.43,.66,t), THREE.SRGBColorSpace);
     inst.setColorAt(i,tc);
   }
   inst.instanceColor && (inst.instanceColor.needsUpdate=true);
@@ -3177,12 +3173,12 @@ curio(balloons,'The Gate Balloons','Tethered since opening day. Nobody remembers
 // Additional pastel balloon bouquets around the park perimeter.
 // Reuse the existing animated balloon group; keep strings fixed to the ground.
 const giftBalloonColors=[0xff83ac,0xffd36e,0x8fd7f2,0xc4a1f2,0x98e2bd,0xffa57e];
-const balloonSpots=[[-38,25],[30,32],[-42,-15],[38,-26],[-9,-42],[12,47]];
+const balloonSpots=[[-38,25],[30,32],[-42,-15],[38,-26]];
 balloonSpots.forEach(([cx,cz],k)=>{
   const bunch=new THREE.Group(); bunch.position.set(cx,hAt(cx,cz),cz);
   for(let j=0;j<4;j++){
     const x=(j-1.5)*.85,z=Math.sin(j*2.1+k)*.55;
-    const height=5.8+(j%3)*.8;
+    const height=7.2+(j%3)*.8;
     const orb=new THREE.Mesh(new THREE.SphereGeometry(.75,10,8),
       new THREE.MeshStandardMaterial({color:giftBalloonColors[(k+j)%giftBalloonColors.length],roughness:.42,metalness:0}));
     orb.position.set(x,height,z);orb.scale.y=1.25;
