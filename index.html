@@ -2466,7 +2466,7 @@ companionSheepSpots.forEach(([x,z],i)=>{
   sheep.rotation.y=[.8,2.6,4.1][i];
   sheep.scale.setScalar(.78+(i%2)*.12);
   sheep.traverse(child=>{if(child.isMesh){child.castShadow=false;}});
-  sheep.userData={companion:true};
+  sheep.userData={companion:true,homeX:x,homeZ:z,phase:i*2.1,rest:0,heading:sheep.rotation.y};
   companionSheep.push(sheep);
   world.add(sheep);
 });
@@ -5611,15 +5611,24 @@ function animate(now){
   clock+=dt;
 
   stepState(dt); pushState(); stepLights(dt); stepWeather(dt);
+  // Lightweight wandering: each sheep stays in a small safe lawn patch.
   companionSheep.forEach((sheep,i)=>{
     const u=sheep.userData;
-    if(!u.restY) u.restY=sheep.position.y;
+    u.phase+=dt*(.35+i*.045);
+    // Smooth closed loops avoid pathfinding, roads and attraction collisions.
+    const radius=2.2+i*.35;
+    const x=u.homeX+Math.cos(u.phase+i)*radius;
+    const z=u.homeZ+Math.sin(u.phase+i)*radius*.72;
+    const dx=-Math.sin(u.phase+i),dz=Math.cos(u.phase+i)*.72;
+    const targetHeading=Math.atan2(dx,dz);
+    const delta=Math.atan2(Math.sin(targetHeading-sheep.rotation.y),Math.cos(targetHeading-sheep.rotation.y));
+    sheep.rotation.y+=delta*Math.min(1,dt*2.2);
+    sheep.position.set(x,hAt(x,z)+Math.abs(Math.sin(clock*4+i))*.045,z);
     const body=sheep.children[0];
     if(body){
-      body.position.y=.95+Math.sin(clock*1.15+i*1.7)*.045;
-      body.rotation.y=Math.sin(clock*.45+i)*.12;
+      body.position.y=.95+Math.sin(clock*5+i*1.7)*.055;
+      body.rotation.y=Math.sin(clock*.55+i)*.07;
     }
-    sheep.position.y=u.restY+Math.sin(clock*.9+i)*.025;
   });
   for(let i=confettiBursts.length-1;i>=0;i--){
     const b=confettiBursts[i];b.age+=dt;
