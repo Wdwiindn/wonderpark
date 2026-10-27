@@ -996,10 +996,10 @@ const PC=window.PARK_CONTENT;
    0 · CONSTANTS, PALETTE, CAPABILITY
    ============================================================ */
 const C = {
-  cream:0xf2e9d8, parchment:0xfbf6ea, paper:0xf1e7d2,
-  sage:0xb3cda4, moss:0x8fae83, forest:0x729a79, deepforest:0x577e69,
-  red:0xe28b92, redDark:0xc86e7e, blue:0x9dcce0, blueDark:0x76a8c7,
-  butter:0xf5d68a, terracotta:0xe8a38a, brass:0xa9884d, brassDark:0x7d6534,
+  cream:0xf7ebdd, parchment:0xfbf6ea, paper:0xf7ebdd,
+  sage:0xb9cead, moss:0xa8cdb5, forest:0x779d84, deepforest:0x607c6c,
+  red:0xe9a8b8, redDark:0xc88796, blue:0xa9cde2, blueDark:0x83aec5,
+  butter:0xf5d995, terracotta:0xe9a18c, brass:0xa9884d, brassDark:0x7d6534,
   ink:0x2a2520, stone:0xbdb2a0, water:0x6d8698, sand:0xd8c9a8,
   burgundy:0x9e6479, amber:0xf4c36e
 };
@@ -1333,9 +1333,9 @@ for(let i=0;i<pos.count;i++){
   // two-tone turf: mown promenade lighter, rough grass darker, plus dry patches
   const q=Math.sin(x*.075+z*.06)*.5+.5;
   const c=new THREE.Color().setHSL(
-    lerp(.29,.255,p*.6+q*.4), lerp(.16,.22,q), lerp(.62,.70,p*.55+q*.45),
+    lerp(.30,.285,p*.6+q*.4), lerp(.18,.21,q), lerp(.68,.73,p*.55+q*.45),
     THREE.SRGBColorSpace);
-  c.lerp(new THREE.Color(0xb2c6a1), edge*.16);
+  c.lerp(new THREE.Color(0xb9cead), edge*.16);
   // faint worn earth where the promenade widens
   const worn=Math.exp(-Math.pow(Math.hypot(x*.9,(z-8)*.42)/17,2));
   c.lerp(new THREE.Color(0xc4b894), worn*.3);
