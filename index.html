@@ -1605,9 +1605,8 @@ function makeTree(kind){
 }
 const trees=new THREE.Group(); world.add(trees);
 const TREE_SPOTS=[
-  [-30,26,'poplar'],[-40,-4,'old'],[30,-18,'round'],
-  [24,44,'poplar'],[-14,44,'round'],[-10,-22,'round'],
-  [8,-20,'round'],[-8,26,'poplar']
+  [-30,26,'round'],[30,-18,'round'],[-14,44,'round'],
+  [8,-20,'round'],[-8,26,'round']
 ];
 // keep a clearance radius around every zone so nothing grows through a building
 const ZONE_CLEAR=[[-40,34,15],[44,36,11],[66,12,15],[-46,2,12],[-24,-30,10],
@@ -1624,7 +1623,7 @@ TREE_SPOTS.forEach(([x,z,k])=>{
 
 // shrubs & flower clumps — instanced for cheapness
 const bushGeo=new THREE.IcosahedronGeometry(1,0);
-const bushes=new THREE.InstancedMesh(bushGeo,mat(0x93a37c,{rough:.94,flat:true}),MOBILE?60:105);
+const bushes=new THREE.InstancedMesh(bushGeo,mat(0x93a37c,{rough:.94,flat:true}),MOBILE?18:30);
 bushes.castShadow=true; bushes.receiveShadow=true;
 {
   const d=new THREE.Object3D();
