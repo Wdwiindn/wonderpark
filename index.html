@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Idea Wonderpark — Anonymous Public Demo</title>
+<title>Wonderpark</title>
 <meta name="description" content="An anonymous interactive portfolio demo about products, research, making, visual experiments and regional perspectives." />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Idea Wonderpark — Anonymous Public Demo" />
+<meta property="og:title" content="Wonderpark" />
 <meta property="og:description" content="An explorable, identity-free portfolio of products, research, learning and visual studies." />
 <meta property="og:image" content="assets/projects/anonymous-project-cover.png" />
 <meta name="theme-color" content="#2c3f34" />
@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
 <style>
   /* ============================================================
-     IDEA WONDERPARK — design contract
+     WONDERPARK — design contract
      Palette: aged fairground paper. Type: editorial serif for the
      world's voice, grotesk for machinery of the interface.
      One signature move: LIGHTS ON cascade. Everything else recedes.
@@ -819,8 +819,8 @@
 
 <div class="hud" id="hud-left">
   <div class="parkmark">
-    <span class="n">Idea Wonderpark</span>
-    <span class="sub">Anonymous public demo · Product × Research × Build</span>
+    <span class="n">Wonderpark</span>
+    <span class="sub"></span>
   </div>
 </div>
 
@@ -842,7 +842,7 @@
 <div id="mapcard" aria-hidden="true">
   <h4>Park Plan</h4>
   <div class="fine">Twelve stops · no personal profile</div>
-  <svg viewBox="0 0 220 168" role="img" aria-label="Plan of Idea Wonderpark">
+  <svg viewBox="0 0 220 168" role="img" aria-label="Plan of Wonderpark">
     <rect x="1" y="1" width="218" height="166" fill="none" stroke="rgba(42,37,32,.25)"/>
     <path d="M110 158 C104 128 118 112 110 92 C102 72 92 62 96 40" fill="none" stroke="rgba(42,37,32,.3)" stroke-width="7" stroke-linecap="round"/>
     <path d="M110 112 C132 108 152 100 166 84" fill="none" stroke="rgba(42,37,32,.22)" stroke-width="5" stroke-linecap="round"/>
@@ -921,13 +921,13 @@
   <div class="foot">A small guide for an anonymous public demo</div>
 </div>
 
-<div id="titlecard"><div class="w"><div class="l1">Welcome to</div><div class="l2">Idea Wonderpark</div></div></div>
+<div id="titlecard"><div class="w"><div class="l1">Welcome to</div><div class="l2">Wonderpark</div></div></div>
 
 <div id="intro">
   <div class="admit">
     <div class="one">Admit One</div>
-    <p class="wp">Idea Wonderpark</p>
-    <div class="tag">Anonymous Public Demo · Product × Research × Build</div>
+    <p class="wp">Wonderpark</p>
+    <div class="tag"></div>
     <div class="no"><span>No. 0001</span><span>Valid Always</span></div>
     <button class="enter" id="enter">Enter the Park</button>
   </div>
@@ -937,7 +937,7 @@
 <div id="loading" role="status" aria-live="polite">
   <div class="stub">
     <div class="srow"><span>Admit One</span><span>No. 0001</span></div>
-    <div class="stitle">Idea Wonderpark</div>
+    <div class="stitle">Wonderpark</div>
     <div class="ssub">Printing your ticket…</div>
     <div class="bar"><i></i></div>
     <div class="step" id="lstep">Raising the gate</div>
@@ -945,7 +945,7 @@
   </div>
 </div>
 <div id="fallback"><div class="box">
-  <h1>Idea Wonderpark</h1>
+  <h1>Wonderpark</h1>
   <p>This park is built with WebGL, and your browser could not open the gate. Try a recent desktop Chrome, Safari or Firefox with hardware acceleration enabled — the park is worth the trip.</p>
 </div></div>
 
@@ -1966,8 +1966,8 @@ const gate=new THREE.Group(); gate.position.set(0,hAt(0,34),34); world.add(gate)
     }
     return px;
   };
-  fitText('IDEA WONDERPARK',940,104,16,'500','"Cormorant Garamond", Georgia, serif');
-  sctx.fillText('IDEA WONDERPARK',512,120);
+  fitText('WONDERPARK',940,104,16,'500','"Cormorant Garamond", Georgia, serif');
+  sctx.fillText('WONDERPARK',512,120);
   sctx.fillStyle='rgba(242,233,216,.72)';
   fitText('MOSTLY OPEN',760,34,10,'400','Inter, sans-serif');
   sctx.fillText('MOSTLY OPEN',512,204);
@@ -3693,7 +3693,7 @@ const BUILDING_NOW=[
   {name:'Agent Landscape',kind:'Research and analysis',sign:'RESEARCH',text:'A broad map of agent architecture, adoption patterns, and product questions.',note:'Public summary only.'},
   {name:'Information Digest',kind:'Automation experiment',sign:'WORKFLOW',text:'A lightweight workflow for collecting sources, creating short summaries, and distributing a daily brief.',note:'Implementation details omitted.'},
   {name:'Editable AI Profile',kind:'Product concept',sign:'PROTOTYPE',text:'A concept for collecting evidence, revealing uncertainty, and keeping an AI profile editable by its user.',note:'Identity materials are not included.'},
-  {name:'Idea Wonderpark',kind:'Interactive portfolio demo',sign:'IN ITERATION',text:'A low-poly environment that turns project types, methods, images, and broad perspectives into a place visitors can navigate.',note:'This is the anonymous public build.'}
+  {name:'Wonderpark',kind:'Interactive portfolio demo',sign:'IN ITERATION',text:'A low-poly environment that turns project types, methods, images, and broad perspectives into a place visitors can navigate.',note:'This is the anonymous public build.'}
 ];
 
 const futureland=new THREE.Group();
@@ -4906,32 +4906,12 @@ function arcadeSheet(){
 
 /* --- Prize Corner: the whole shelf at once, as a prize list --- */
 function prizeSheet(){
-  const groups=PRIZES.map(p=>`<div class="prize"><div class="kicker">${esc(p.c)}</div><div class="pt">${esc(p.t)}</div><div class="pd">${esc(p.d)}</div></div>`).join('');
-  openSheet(`
-    <div class="pinned">
-      <div class="kicker">Prize Corner · selected evidence</div>
-      <h2 class="serif-xl">Awards & Outcomes</h2>
-      <div class="prose"><p>Only recorded awards and measurable outcomes are kept on this shelf.</p></div>
-      <div class="rule"></div>
-      ${groups}
-      <button class="back-inline" data-close>← Back to park</button>
-    </div>`);
+  openSheet(`<div class="pinned"><div class="kicker">05 · Prize Corner</div><h2 class="serif-xl">Best Partner Award</h2><div class="prose"><p>Congratulations, Miranda! You've won Wonderpark's Best Partner Award!</p><p>For being funny, adorable, a little forgetful sometimes, and always my favorite partner in crime.</p><p>Award validity: Lifetime!</p></div><button class="sheet-close" data-close>← Back to Park</button></div>`);
 }
 
 /* --- The Gallopers: what a carousel is for --- */
 function carouselSheet(){
-  const interests=PC.interests.map(([name,note])=>`<div class="metarow"><span>${esc(name)}</span><span>${esc(note)}</span></div>`).join('');
-  openSheet(`
-    <div class="pinned">
-      <div class="kicker">The Gallopers · runs continuously</div>
-      <h2 class="serif-xl">Things I Keep Coming Back To</h2>
-      <div class="prose">
-        <p>A carousel goes nowhere, which is the point. These are the interests that keep returning through changes of place, work and tools.</p>
-      </div>
-      <div class="rule"></div>
-      ${interests}
-      <button class="back-inline" data-close>← Back to park</button>
-    </div>`);
+  openSheet(`<div class="pinned"><div class="kicker">02 · Carousel</div><h2 class="serif-xl">How We Met</h2><div class="prose"><p>Remember when we first met?</p><p>Somehow, we ended up sitting next to each other in class! You had your hair in a high ponytail, wore black-framed glasses, and always looked so serious during lessons.</p><p>Who knew we'd become such good friends?</p></div><button class="sheet-close" data-close>← Back to Park</button></div>`);
 }
 
 /* --- The Gallery: a museum label, then the prints themselves --- */
@@ -5201,31 +5181,7 @@ function ferrisSheet(){
 
 /* --- coaster: a folded programme with the ride's journey --- */
 function coasterSheet(){
-  const r=RIDES[activeRide]||RIDES[0];
-  const list=RIDES.map((x,i)=>
-    `<button class="ride" data-ride="${i}" aria-current="${i===activeRide}">
-       <span class="rn">${esc(x.title)}</span><span class="rk">${esc(x.time||'')}</span>
-     </button>`).join('');
-  const cover=r.coverImage?`<img class="project-cover" src="${esc(contentPath(r.coverImage))}" loading="lazy" decoding="async" alt="${esc(`${r.title} project cover`)}">`:'';
-  openSheet(`
-    <div class="program">
-      <div class="head">
-        <div class="kicker">Project Coaster · Anonymous study ${activeRide+1} of ${RIDES.length}</div>
-        <h2 class="serif-xl">${esc(r.title)}</h2>
-        <div class="metarow" style="margin-top:8px"><span>${esc(r.role)}</span><span>${esc(r.time)}</span></div>
-      </div>
-      ${cover}
-      <div class="prose"><p>${esc(r.oneLiner)}</p></div>
-      <div class="rule"></div>
-      <div class="kicker">What it explores</div><p class="project-proof">${esc(r.outcome)}</p>
-      <div class="metarow">${(r.tags||[]).map(tag=>`<span>${esc(tag)}</span>`).join('')}</div>
-      <div class="actionrow">${projectActions(r)}</div>
-      <div class="rule"></div>
-      <div class="kicker" style="margin-bottom:8px">Anonymous studies</div>
-      <div class="ridelist">${list}</div>
-      <div class="actionrow"><button class="paper-action" data-project-archive>Open all anonymous studies →</button></div>
-      <button class="sheet-close" data-close>← Back to Park</button>
-    </div>`);
+  openSheet(`<div class="pinned"><div class="kicker">03 · Roller Coaster</div><h2 class="serif-xl">That Close Call</h2><div class="prose"><p>Remember when we were secretly eating snacks under the desk and our teacher suddenly walked over?</p><p>You shoved the chips into your drawer so fast you almost spilled the whole bag.</p><p>I still laugh whenever I think about it!</p></div><button class="sheet-close" data-close>← Back to Park</button></div>`);
 }
 
 function projectCategory(project){
@@ -5255,24 +5211,7 @@ function projectDetailSheet(slug){
 
 /* --- idea circus: a pinned note, handwriting and all --- */
 function circusSheet(){
-  const t=TENTS[activeTent];
-  const grid=TENTS.map((x,i)=>
-    `<button class="tent" data-tent="${i}" aria-current="${i===activeTent}">
-       <span class="tn">${esc(x.name)}</span><span class="tk">${esc(x.kind)}</span>
-     </button>`).join('');
-  openSheet(`
-    <div class="pinned">
-      <div class="kicker">Idea Circus · No business case required</div>
-      <h2 class="serif-xl">${esc(t.name)}</h2>
-      <div class="metarow" style="margin:8px 0 14px"><span>${esc(t.kind)}</span></div>
-      <img class="project-cover" src="${esc(t.image)}" loading="lazy" decoding="async" alt="${esc(t.name)}">
-      <div class="prose"><p>${esc(t.text)}</p></div>
-      <div class="rule"></div>
-      <div class="kicker">Featured visual experiments</div>
-      <div class="tentgrid">${grid}</div>
-      <div class="actionrow"><button class="paper-action" data-ai-archive>Open the public AI Lab selection →</button></div>
-      <button class="sheet-close" data-close>← Back to Park</button>
-    </div>`);
+  openSheet(`<div class="pinned"><div class="kicker">04 · Circus</div><h2 class="serif-xl">Our Favorite Places</h2><div class="prose"><p>We loved spending time at the library and that little café around the corner.</p><p>You always ordered a latte, even after promising you'd cut back on coffee.</p><p>I hope we get to go back together again and again.</p></div><div class="tentgrid"><figure><img class="project-cover" src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=900&amp;auto=format&amp;fit=crop" alt="Library" loading="lazy"><figcaption>Our library days</figcaption></figure><figure><img class="project-cover" src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=900&amp;auto=format&amp;fit=crop" alt="Café" loading="lazy"><figcaption>Our coffee spot</figcaption></figure></div><button class="sheet-close" data-close>← Back to Park</button></div>`);
 }
 
 async function aiArchiveSheet(){
@@ -5292,26 +5231,7 @@ function aiDetailSheet(kind,index){
 
 /* --- gate: the park's own museum label --- */
 function gateSheet(){
-  const p=PC.profile;
-  openSheet(`
-    <div class="label-plate">
-      <div class="kicker">Entrance · ${esc(p.locations.join(' · '))}</div>
-      <h2 class="serif-xl">${esc(p.name)}</h2>
-      <div class="metarow"><span>${esc(p.role)}</span><span>Anonymous public edition</span></div>
-      <div class="rule"></div>
-      <div class="prose">
-        <p><em>${esc(p.intro)}</em></p>
-        <p>${esc(p.story)}</p>
-        <p>The wheel holds broad capability chapters, the coaster holds generalized project types, and the garden keeps the methods behind both. Dolly can turn them into a short route.</p>
-      </div>
-      <div class="rule"></div>
-      <div class="actionrow">
-        <button class="paper-action" data-jump="coaster">Explore selected work →</button>
-        <button class="paper-action secondary" data-jump="garden">Explore methods →</button>
-        <button class="paper-action secondary" data-jump="globe">Explore the abstract globe →</button>
-      </div>
-      <button class="sheet-close" data-close>← Back to Park</button>
-    </div>`);
+  openSheet(`<div class="pinned"><div class="kicker">01 · Entrance</div><h2 class="serif-xl">Welcome to Wonderpark!</h2><div class="prose"><p>Miranda, welcome to our wonderful park!</p><p>Ready? Our story is about to begin.</p></div><button class="sheet-close" data-close>← Back to Park</button></div>`);
 }
 
 /* --- graveyard: the easter egg --- */
@@ -5421,7 +5341,7 @@ function openDolly(){
   if(!logEl.childElementCount){
     dollySay(late
       ? 'Oh — hello. It is late and I was mostly asleep. Ask anyway, I will manage.'
-      : 'Welcome to Idea Wonderpark. I am Dolly, the guide to this anonymous public demo.');
+      : 'Welcome to Wonderpark. I am Dolly, the guide to this anonymous public demo.');
     dollyAsks(DOLLY_SCRIPT.root.slice(0,4).map(x=>x.q));
   }
 }
