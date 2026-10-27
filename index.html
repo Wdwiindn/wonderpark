@@ -2455,6 +2455,19 @@ world.add(dolly);
   tail.position.set(0,.2,-1.05); bodyG.add(tail);
   dolly.userData={bodyG,headG,eyes,state:'idle',t:0,walkTarget:null,home:dolly.position.clone()};
 }
+// Three quiet companion sheep reuse Dolly's existing geometry and materials.
+// Dolly remains the only interactive and animated guide.
+const companionSheepSpots=[[-12,11],[16,-13],[31,7]];
+companionSheepSpots.forEach(([x,z],i)=>{
+  const sheep=dolly.clone(true);
+  sheep.position.set(x,hAt(x,z),z);
+  sheep.rotation.y=[.8,2.6,4.1][i];
+  sheep.scale.setScalar(.78+(i%2)*.12);
+  sheep.traverse(child=>{if(child.isMesh){child.castShadow=false;}});
+  sheep.userData={companion:true};
+  world.add(sheep);
+});
+
 /* Dolly is not furniture: these are the places she wanders between.
    Must live at module scope — a block-scoped const is invisible to the loop. */
 const DOLLY_STOPS=[[BO.x,BO.z+3],[2,2],[-40,34],[44,36],[66,12],[-46,2],[-24,-30],[-33,60],[26,18],[0,34],[18,-16],[-14,14]];
@@ -3049,7 +3062,7 @@ curio(balloons,'The Gate Balloons','Tethered since opening day. Nobody remembers
 // Additional pastel balloon bouquets around the park perimeter.
 // Reuse the existing animated balloon group; keep strings fixed to the ground.
 const giftBalloonColors=[0xff83ac,0xffd36e,0x8fd7f2,0xc4a1f2,0x98e2bd,0xffa57e];
-const balloonSpots=[[-38,25],[30,32],[-42,-15],[38,-26]];
+const balloonSpots=[[-38,25],[30,32],[-42,-15],[38,-26],[14,12],[-19,-14],[35,5]];
 balloonSpots.forEach(([cx,cz],k)=>{
   const bunch=new THREE.Group(); bunch.position.set(cx,hAt(cx,cz),cz);
   for(let j=0;j<4;j++){
