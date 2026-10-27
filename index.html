@@ -1156,9 +1156,9 @@ const STATES={
   day:{
     top:0x5fa8de, mid:0x9fd0f2, bot:0xf6e9d8,
     fog:0xe4eef6, fogNear:280, fogFar:900,   // crisper ridgeline, less grey haze
-    sunPos:[-38,74,52], sunColor:0xfff2d2, sunI:2.5,
-    hemiSky:0xe4eff7, hemiGround:0x9fa894, hemiI:1.45,
-    fillI:.42, exposure:1.18, bloom:.22, bulb:.06, star:0, vig:.18, sat:1.10
+    sunPos:[-38,74,52], sunColor:0xfff2d2, sunI:2.7,
+    hemiSky:0xf2f2ff, hemiGround:0xc7bcb0, hemiI:1.65,
+    fillI:.50, exposure:1.24, bloom:.24, bulb:.06, star:0, vig:.12, sat:1.14
   },
   sunset:{
     top:0x6f7fa8, mid:0xf0a878, bot:0xf3c58e,
@@ -1437,38 +1437,36 @@ let SKIRT_SNOW=null;   // outer-country snow blanket, driven with the park's
   SKIRT_SNOW=skirtSnow;
 }
 
-// receding ridgelines: four bands of hills, each paler and flatter than the last
+// Cloud-ring experiment: keep the playable park and its terrain untouched.
+// Replace only the distant conical mountain silhouettes with soft, faceted clouds.
 {
-  const drop=d=>{ const t=(d-GW*.44)/(GW*3.96); const ft=Math.max(0,(t-.20)/.80); return -ft*ft*168-1.2; };
-  const bands=[
-    {d:GW*1.55, h:26, n:13, c:0x8b9c81, o:1.00},
-    {d:GW*2.25, h:40, n:11, c:0x99a891, o:0.92},
-    {d:GW*3.10, h:58, n:10, c:0xa6b3a6, o:0.80},
-    {d:GW*4.05, h:78, n:9,  c:0xb4bfba, o:0.64}
-  ];
-  bands.forEach((b,bi)=>{
-    const m=new THREE.MeshStandardMaterial({
-      color:b.c, roughness:.99, metalness:0, transparent:true, opacity:b.o,
-      fog:true, flatShading:true});
-    m.__base=m.color.clone(); BEYOND_MATS.push(m);
-    for(let i=0;i<b.n;i++){
-      const a=(i/b.n)*Math.PI*2 + bi*.42;
-      const jitter=(Math.sin(i*12.9+bi*4.7)*.5+.5);
-      const dist=b.d*(.86+jitter*.28);
-      const hh=b.h*(.62+jitter*.75);
-      const rr=hh*(1.5+jitter*1.1);
-      const hill=new THREE.Mesh(new THREE.ConeGeometry(rr,hh,MOBILE?6:9,1),m);
-      hill.position.set(Math.cos(a)*dist, drop(dist)+hh*.36, Math.sin(a)*dist);
-      hill.rotation.y=jitter*3.1;
-      hill.scale.set(1,.72+jitter*.4,1.35+jitter*.5);
-      beyond.add(hill);
-    }
+  const cloudPalette=[0xf9e9e2,0xe5e7ff,0xd7e9f5,0xffe3df,0xf4e9cf];
+  const puffGeo=new THREE.IcosahedronGeometry(1,1);
+  const puffMats=cloudPalette.map(color=>{
+    const m=new THREE.MeshStandardMaterial({color,roughness:1,flatShading:true,fog:true});
+    m.__base=m.color.clone(); BEYOND_MATS.push(m); return m;
   });
+  const cloudCount=MOBILE?34:54;
+  for(let i=0;i<cloudCount;i++){
+    const a=i*2.399963229728653;
+    const dist=GW*(1.05+(i%4)*.33);
+    const x=Math.cos(a)*dist,z=Math.sin(a)*dist;
+    const cloud=new THREE.Group();
+    cloud.position.set(x,8+(i%5)*2.3,z);
+    const scale=10+(i%7)*2.8;
+    for(let j=0;j<5;j++){
+      const puff=new THREE.Mesh(puffGeo,puffMats[(i+j)%puffMats.length]);
+      puff.position.set((j-2)*scale*.44,Math.sin(j*2.4+i)*scale*.12,Math.cos(j*1.8+i)*scale*.18);
+      puff.scale.set(scale*(.60+(j%3)*.13),scale*(.40+(j%2)*.10),scale*.68);
+      cloud.add(puff);
+    }
+    beyond.add(cloud);
+  }
 }
 
 // far treeline haze: a soft ring of dark conifers where park meets country
 {
-  const n=MOBILE?150:420;
+  const n=MOBILE?48:115; // fewer dark conifers: open up the cloud horizon
   const geo=new THREE.ConeGeometry(1,1,MOBILE?5:7,2);
   const m=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.98,flatShading:true});
   m.__base=m.color.clone(); BEYOND_MATS.push(m);
@@ -3175,6 +3173,30 @@ const balloons=new THREE.Group(); world.add(balloons);
   str.position.set(x,hAt(x,z)+2.7+i*.25,z); balloons.add(str);
 });
 curio(balloons,'The Gate Balloons','Tethered since opening day. Nobody remembers buying them.');
+
+// Additional pastel balloon bouquets around the park perimeter.
+// Reuse the existing animated balloon group; keep strings fixed to the ground.
+const giftBalloonColors=[0xff83ac,0xffd36e,0x8fd7f2,0xc4a1f2,0x98e2bd,0xffa57e];
+const balloonSpots=[[-38,25],[30,32],[-42,-15],[38,-26],[-9,-42],[12,47]];
+balloonSpots.forEach(([cx,cz],k)=>{
+  const bunch=new THREE.Group(); bunch.position.set(cx,hAt(cx,cz),cz);
+  for(let j=0;j<4;j++){
+    const x=(j-1.5)*.85,z=Math.sin(j*2.1+k)*.55;
+    const height=5.8+(j%3)*.8;
+    const orb=new THREE.Mesh(new THREE.SphereGeometry(.75,10,8),
+      new THREE.MeshStandardMaterial({color:giftBalloonColors[(k+j)%giftBalloonColors.length],roughness:.42,metalness:0}));
+    orb.position.set(x,height,z);orb.scale.y=1.25;
+    orb.userData.i=k*4+j+10;
+    bunch.add(orb);
+    const string=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,height-1.3,3),
+      new THREE.MeshBasicMaterial({color:0xcabcae}));
+    string.position.set(x/2,(height-1.3)/2+.5,z/2);
+    bunch.add(string);
+  }
+  world.add(bunch);
+  balloons.add(bunch); // animation handles the original loose balloons; bouquets remain anchored.
+});
+
 
 /* ============================================================
    13 · ATMOSPHERE — motes, stars, birds, fireflies
