@@ -809,6 +809,12 @@
   @media (prefers-reduced-motion:reduce){
     *{animation-duration:.01ms !important;transition-duration:.14s !important;}
   }
+
+  /* Gift memory photo cards: balanced thumbnails and readable captions */
+  .memory-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px;}
+  .memory-photo-grid figure{margin:0;min-width:0;}
+  .memory-photo-grid img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border:1px solid var(--ui-line);border-radius:5px;margin:0;}
+  .memory-photo-grid figcaption{font:500 12px/1.4 var(--ui);color:var(--ink-soft);margin-top:8px;overflow-wrap:break-word;}
 </style>
 </head>
 <body class="intro-open" data-focus="0">
@@ -5211,7 +5217,7 @@ function projectDetailSheet(slug){
 
 /* --- idea circus: a pinned note, handwriting and all --- */
 function circusSheet(){
-  openSheet(`<div class="pinned"><div class="kicker">04 · Circus</div><h2 class="serif-xl">Our Favorite Places</h2><div class="prose"><p>We loved spending time at the library and that little café around the corner.</p><p>You always ordered a latte, even after promising you'd cut back on coffee.</p><p>I hope we get to go back together again and again.</p></div><div class="tentgrid"><figure><img class="project-cover" src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=900&amp;auto=format&amp;fit=crop" alt="Library" loading="lazy"><figcaption>Our library days</figcaption></figure><figure><img class="project-cover" src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=900&amp;auto=format&amp;fit=crop" alt="Café" loading="lazy"><figcaption>Our coffee spot</figcaption></figure></div><button class="sheet-close" data-close>← Back to Park</button></div>`);
+  openSheet(`<div class="pinned"><div class="kicker">04 · Circus</div><h2 class="serif-xl">Our Favorite Places</h2><div class="prose"><p>We loved spending time at the library and that little café around the corner.</p><p>You always ordered a latte, even after promising you'd cut back on coffee.</p><p>I hope we get to go back together again and again.</p></div><div class="memory-photo-grid"><figure><img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=900&amp;auto=format&amp;fit=crop" alt="Library" loading="lazy"><figcaption>Our library days</figcaption></figure><figure><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=900&amp;auto=format&amp;fit=crop" alt="Café" loading="lazy"><figcaption>Our coffee spot</figcaption></figure></div><button class="sheet-close" data-close>← Back to Park</button></div>`);
 }
 
 async function aiArchiveSheet(){
