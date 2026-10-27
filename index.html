@@ -1809,7 +1809,8 @@ addEventListener('mousedown',e=>{ curioDown=[e.clientX,e.clientY]; },true);
 function curioPick(cx,cy){
   const c=curioHit(cx,cy);
   if(!c) return false;
-  toast(c.label+' — '+c.cap);
+  if(c.onClick) c.onClick();
+  else toast(c.label+' — '+c.cap);
   return true;
 }
 addEventListener('mouseup',e=>{
@@ -2458,6 +2459,7 @@ world.add(dolly);
 // Three quiet companion sheep reuse Dolly's existing geometry and materials.
 // Dolly remains the only interactive and animated guide.
 const companionSheepSpots=[[-12,11],[16,-13],[31,7]];
+const companionSheep=[];
 companionSheepSpots.forEach(([x,z],i)=>{
   const sheep=dolly.clone(true);
   sheep.position.set(x,hAt(x,z),z);
@@ -2465,6 +2467,7 @@ companionSheepSpots.forEach(([x,z],i)=>{
   sheep.scale.setScalar(.78+(i%2)*.12);
   sheep.traverse(child=>{if(child.isMesh){child.castShadow=false;}});
   sheep.userData={companion:true};
+  companionSheep.push(sheep);
   world.add(sheep);
 });
 
@@ -3082,6 +3085,45 @@ balloonSpots.forEach(([cx,cz],k)=>{
   balloons.add(bunch); // animation handles the original loose balloons; bouquets remain anchored.
 });
 
+
+// Three reusable celebration boxes. Confetti is transient and disposed after landing.
+const giftBoxes=[];
+const confettiBursts=[];
+const giftColors=[0xe9a8b8,0xa9cde2,0xf5d995];
+[[18,9],[-20,-12],[38,14]].forEach(([x,z],i)=>{
+  const group=new THREE.Group();
+  group.position.set(x,hAt(x,z)+.65,z);
+  const body=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.3,2.4),
+    new THREE.MeshStandardMaterial({color:giftColors[i],roughness:.75}));
+  const ribbonMat=new THREE.MeshStandardMaterial({color:0xfff3db,roughness:.65});
+  const ribbonA=new THREE.Mesh(new THREE.BoxGeometry(.34,1.39,2.46),ribbonMat);
+  const ribbonB=new THREE.Mesh(new THREE.BoxGeometry(2.46,1.39,.34),ribbonMat);
+  const lid=new THREE.Mesh(new THREE.BoxGeometry(2.65,.3,2.65),
+    new THREE.MeshStandardMaterial({color:giftColors[i],roughness:.75}));
+  lid.position.y=.78;
+  group.add(body,ribbonA,ribbonB,lid);
+  world.add(group);
+  giftBoxes.push(group);
+  curio(group,'Surprise Gift','Click to celebrate!');
+  CURIOS[CURIOS.length-1].onClick=()=>{
+    const n=MOBILE?28:52;
+    const geo=new THREE.PlaneGeometry(.22,.42);
+    const mat=new THREE.MeshBasicMaterial({vertexColors:false,side:THREE.DoubleSide});
+    const confetti=new THREE.InstancedMesh(geo,mat,n);
+    const dummy=new THREE.Object3D(),parts=[];
+    for(let j=0;j<n;j++){
+      const a=j*2.399963, speed=3+(j%7)*.7;
+      parts.push({x:Math.cos(a)*.5,y:2.1,z:Math.sin(a)*.5,
+        vx:Math.cos(a)*speed,vy:5+(j%5)*1.1,vz:Math.sin(a)*speed,spin:j*.9});
+      confetti.setColorAt(j,new THREE.Color(giftColors[j%giftColors.length]));
+      dummy.position.set(parts[j].x,parts[j].y,parts[j].z);
+      dummy.updateMatrix();confetti.setMatrixAt(j,dummy.matrix);
+    }
+    const burst=new THREE.Group();burst.position.copy(group.position);
+    burst.add(confetti);world.add(burst);
+    confettiBursts.push({burst,confetti,geo,mat,parts,age:0});
+  };
+});
 
 /* ============================================================
    13 · ATMOSPHERE — motes, stars, birds, fireflies
@@ -5569,6 +5611,33 @@ function animate(now){
   clock+=dt;
 
   stepState(dt); pushState(); stepLights(dt); stepWeather(dt);
+  companionSheep.forEach((sheep,i)=>{
+    const u=sheep.userData;
+    if(!u.restY) u.restY=sheep.position.y;
+    const body=sheep.children[0];
+    if(body){
+      body.position.y=.95+Math.sin(clock*1.15+i*1.7)*.045;
+      body.rotation.y=Math.sin(clock*.45+i)*.12;
+    }
+    sheep.position.y=u.restY+Math.sin(clock*.9+i)*.025;
+  });
+  for(let i=confettiBursts.length-1;i>=0;i--){
+    const b=confettiBursts[i];b.age+=dt;
+    const dummy=new THREE.Object3D();
+    b.parts.forEach((p,j)=>{
+      p.vy-=11*dt;
+      p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;
+      dummy.position.set(p.x,Math.max(.02,p.y),p.z);
+      dummy.rotation.set(b.age*3+p.spin,b.age*2+p.spin,0);
+      dummy.scale.setScalar(p.y<=.02?0:1);
+      dummy.updateMatrix();b.confetti.setMatrixAt(j,dummy.matrix);
+    });
+    b.confetti.instanceMatrix.needsUpdate=true;
+    if(b.age>2.8){
+      world.remove(b.burst);b.geo.dispose();b.mat.dispose();confettiBursts.splice(i,1);
+    }
+  }
+
 
   /* --- ferris wheel: slow, mechanical, occasionally deliberate --- */
   const wheelG=ferris.userData.wheel;
