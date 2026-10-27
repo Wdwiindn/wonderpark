@@ -997,11 +997,11 @@ const PC=window.PARK_CONTENT;
    ============================================================ */
 const C = {
   cream:0xf2e9d8, parchment:0xfbf6ea, paper:0xf1e7d2,
-  sage:0x9dad8a, moss:0x748c66, forest:0x4d6b4c, deepforest:0x3a5340,
-  red:0xb45248, redDark:0x8e3f38, blue:0x7b93a9, blueDark:0x5c7288,
-  butter:0xe6c876, terracotta:0xbd7355, brass:0xa9884d, brassDark:0x7d6534,
+  sage:0xb3cda4, moss:0x8fae83, forest:0x729a79, deepforest:0x577e69,
+  red:0xe28b92, redDark:0xc86e7e, blue:0x9dcce0, blueDark:0x76a8c7,
+  butter:0xf5d68a, terracotta:0xe8a38a, brass:0xa9884d, brassDark:0x7d6534,
   ink:0x2a2520, stone:0xbdb2a0, water:0x6d8698, sand:0xd8c9a8,
-  burgundy:0x6b2e32, amber:0xeaa94e
+  burgundy:0x9e6479, amber:0xf4c36e
 };
 const MOBILE = matchMedia('(max-width:900px), (pointer:coarse)').matches;
 const REDUCED = matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -1365,140 +1365,8 @@ const beyond=new THREE.Group(); world.add(beyond);
 const BEYOND_MATS=[];
 let SKIRT_SNOW=null;   // outer-country snow blanket, driven with the park's
 
-// outer skirt: continues the turf past the park, falling away gently
-{
-  /* R0 tucks just inside the disc edge: the rings overlap by a hair rather than
-     butting against each other, so nothing can show through between them. */
-  const R0=GW*.60*.985, R1=GW*4.4, rings=MOBILE?14:22, seg=SEAM_SEG;
-  const pos=[],col=[],idx=[],uvs=[];
-  for(let r=0;r<=rings;r++){
-    const t=r/rings, rad=lerp(R0,R1,t*t*.85+t*.15);
-    for(let a=0;a<=seg;a++){
-      const th=(a/seg)*Math.PI*2;
-      // break the perfect circle: the join wanders in and out like a real treeline
-      const wob=1+(seamWobble(th)-1)*Math.pow(1-t,1.5);
-      const rad2=rad*wob;
-      const x=Math.cos(th)*rad2, z=Math.sin(th)*rad2;
-      // rolling country, sinking slowly so distant land sits below the park
-      const roll=Math.sin(th*2.3+rad2*.03)*2.4+Math.sin(th*4.1-rad2*.02)*1.5;
-      const ft=Math.max(0,(t-.20)/.80);
-      const fall=-ft*ft*168;
-      // near the join, sit exactly on the park's own terrain so there is no lip;
-      // let go of it gradually as the country takes over
-      const joinR=GW*.60;
-      const w=1-Math.min(1,Math.max(0,(rad2-joinR*.98)/(joinR*.55)));
-      const hTer=terrainH(x,z);
-      const country=fall+roll*(1-t*.35)*Math.min(1,Math.max(0,(t-.30)*4.0))-1.2;
-      /* The rings overlap by 1.5% of the radius. Where they do, drop the skirt a
-         few centimetres so the two surfaces are never coplanar — coplanar faces
-         at this distance z-fight into a flickering ring, which reads as exactly
-         the hard edge the overlap is meant to remove. Under the disc, so the
-         park's own turf is what you see. */
-      const tuck=-0.06*Math.min(1,Math.max(0,(w-0.55)/0.45));
-      pos.push(x, country*(1-w)+hTer*w+tuck, z);
-      // greens desaturate and cool with distance — aerial perspective
-      const c=new THREE.Color().setHSL(
-        lerp(.200,.265,t), lerp(.17,.075,t), lerp(.475,.64,t), THREE.SRGBColorSpace);
-      // match the park's weathered rim colour where the two meet
-      c.lerp(new THREE.Color(0x8b9673), w*.42);
-      col.push(c.r,c.g,c.b);
-      uvs.push(x/24,z/24);
-    }
-  }
-  for(let r=0;r<rings;r++) for(let a=0;a<seg;a++){
-    const o=r*(seg+1)+a, o2=(r+1)*(seg+1)+a;
-    idx.push(o,o+1,o2, o+1,o2+1,o2);
-  }
-  const g=new THREE.BufferGeometry();
-  g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
-  g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
-  g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
-  g.setIndex(idx); g.computeVertexNormals();
-  const skirt=new THREE.Mesh(g,new THREE.MeshStandardMaterial({
-    vertexColors:true, roughness:.97, metalness:0, map:grainTex}));
-  skirt.receiveShadow=false; beyond.add(skirt);
-  if(skirt.material){ skirt.material.__base=skirt.material.color?skirt.material.color.clone():null; BEYOND_MATS.push(skirt.material); }
-  // a matching blanket over the outer country, so the snow line isn't a hard ring
-  const gSnow=g.clone();
-  // vertex alpha: full white at the park edge, feathering out into the distance
-  {
-    const sp=gSnow.attributes.position, sc=[];
-    for(let i=0;i<sp.count;i++){
-      const rr=Math.hypot(sp.getX(i),sp.getZ(i));
-      const k=1-Math.min(1,Math.max(0,(rr-GW*1.5)/(GW*2.2)));
-      sc.push(k,k,k);
-    }
-    gSnow.setAttribute('color',new THREE.Float32BufferAttribute(sc,3));
-  }
-  const skirtSnow=new THREE.Mesh(gSnow,new THREE.MeshStandardMaterial({
-    color:0xeef3f6, roughness:.80, metalness:0, transparent:true, opacity:0,
-    depthWrite:true, vertexColors:true}));
-  skirtSnow.position.y=.05; skirtSnow.visible=false; beyond.add(skirtSnow);
-  SKIRT_SNOW=skirtSnow;
-}
-
-// A restrained distant cloud bank, below the skyline instead of floating rocks.
-// Keep the sky open and avoid adding more geometry over the rides.
-{
-  const cloudMat=new THREE.MeshStandardMaterial({color:0xf4f0e8,roughness:1,flatShading:false,fog:true});
-  cloudMat.__base=cloudMat.color.clone(); BEYOND_MATS.push(cloudMat);
-  const puffGeo=new THREE.SphereGeometry(1,MOBILE?10:14,8);
-  const cloudCount=MOBILE?11:18;
-  for(let i=0;i<cloudCount;i++){
-    const angle=i*2.399963229728653;
-    const dist=GW*(1.65+(i%3)*.35);
-    const cloud=new THREE.Group();
-    cloud.position.set(Math.cos(angle)*dist,-11-(i%3)*3,Math.sin(angle)*dist);
-    const width=17+(i%4)*5;
-    for(let j=0;j<4;j++){
-      const puff=new THREE.Mesh(puffGeo,cloudMat);
-      puff.position.set((j-1.5)*width*.32,Math.sin(j*2.1+i)*1.5,Math.cos(j*1.7)*2);
-      puff.scale.set(width*.39,width*.20,width*.30);
-      cloud.add(puff);
-    }
-    beyond.add(cloud);
-  }
-}
-
-// far treeline haze: a soft ring of dark conifers where park meets country
-{
-  const n=MOBILE?65:145; // sparse, varied treeline
-  const geo=new THREE.ConeGeometry(1,1,MOBILE?5:7,2);
-  const m=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.98,flatShading:true});
-  m.__base=m.color.clone(); BEYOND_MATS.push(m);
-  const inst=new THREE.InstancedMesh(geo,m,n);
-  const d=new THREE.Object3D(), tc=new THREE.Color();
-  for(let i=0;i<n;i++){
-    // scattered in depth instead of a single ring, thinning outward
-    const a=(i/n)*Math.PI*2+Math.sin(i*7.3)*.22+Math.cos(i*2.1)*.11;
-    const depth=Math.pow(Math.abs(Math.sin(i*3.7)),.7);
-    const rad=GW*.58+2+depth*GW*1.15;
-    const t=Math.min(1,(rad-GW*.58)/(GW*1.15));
-    // two silhouettes: slim firs, squatter broadleaf clumps
-    const fir=(i%3)!==0;
-    const h=lerp(fir?10:7.4,fir?5.2:4.2,t)*(.66+Math.abs(Math.sin(i*5.1))*.66);
-    const wd=(fir?.30:.46)*(.85+Math.abs(Math.cos(i*4.3))*.4);
-    const joinR=GW*.60;
-    const wj=1-Math.min(1,Math.max(0,(rad-joinR*.92)/(joinR*.62)));
-    const tt=(rad-GW*.44)/(GW*3.96);
-    const ft=Math.max(0,(tt-.20)/.80);
-    const country=-ft*ft*168-1.1;
-    const gy=terrainH(Math.cos(a)*rad,Math.sin(a)*rad);
-    const baseY=country*(1-wj)+gy*wj;
-    d.position.set(Math.cos(a)*rad, baseY+h/2-.3, Math.sin(a)*rad);
-    d.scale.set(h*wd,h,h*wd);
-    // a slight lean so the treeline doesn't look machine-planted
-    d.rotation.set(Math.sin(i*1.7)*.05,i*1.7,Math.cos(i*2.3)*.05);
-    d.updateMatrix(); inst.setMatrixAt(i,d.matrix);
-    // recede in colour with distance so the trees melt into the hills
-    tc.setHSL(lerp(.27,.38,Math.abs(Math.sin(i*1.9))*.5+t*.5),
-              lerp(.15,.25,t), lerp(.43,.66,t), THREE.SRGBColorSpace);
-    inst.setColorAt(i,tc);
-  }
-  inst.instanceColor && (inst.instanceColor.needsUpdate=true);
-  beyond.add(inst);
-}
-
+// Sky-city edition: no distant terrain, cloud ring or forest.
+ // Keep the central playable island disc; leave the open sky as the horizon.
 // base plate edge — kept but sunk far below, so the park still has a lip
 const plate=new THREE.Mesh(new THREE.CylinderGeometry(GW*.598,GW*.57,7.0,MOBILE?48:96,1,false),
   mat(0xc9b795,{rough:.9}));
@@ -1737,14 +1605,9 @@ function makeTree(kind){
 }
 const trees=new THREE.Group(); world.add(trees);
 const TREE_SPOTS=[
-  [-30,26,'poplar'],[-34,14,'round'],[-40,-4,'old'],[-36,-16,'poplar'],
-  [-4,-36,'round'],[10,-32,'old'],
-  [30,-18,'round'],[38,-2,'old'],[24,44,'poplar'],
-  [12,44,'round'],[-2,48,'poplar'],[-14,44,'round'],[18,18,'round'],
-  [-20,20,'old'],[52,-30,'old'],
-  [-48,-24,'round'],[-10,-22,'round'],
-  [-34,-36,'old'],[58,4,'poplar'],[-56,6,'round'],[6,-46,'poplar'],[36,46,'poplar'],
-  [-56,30,'poplar'],[8,-20,'round'],[-8,26,'poplar'],[60,-20,'round'],[-60,-8,'old']
+  [-30,26,'poplar'],[-40,-4,'old'],[30,-18,'round'],
+  [24,44,'poplar'],[-14,44,'round'],[-10,-22,'round'],
+  [8,-20,'round'],[-8,26,'poplar']
 ];
 // keep a clearance radius around every zone so nothing grows through a building
 const ZONE_CLEAR=[[-40,34,15],[44,36,11],[66,12,15],[-46,2,12],[-24,-30,10],
